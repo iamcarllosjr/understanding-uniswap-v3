@@ -2,7 +2,12 @@
 
  - Uniswap v3 é muito diferente do Uniswap v2. Embora os pools Uniswap v3 também tenham dois tokens e usem uma fórmula de produto constante (X * Y = K), o Uniswap v3 introduz um novo conceito chamado "Liquidez Concentrada". A ideia principal desse recurso é que os fornecedores pode fornecer em uma faixa de preço escolhida e implica que as reservas de cada posição são apenas o suficiente para suportar a negociação dentro de sua faixa. Quando o preço sai desse intervalo, a posição do provedor de liquidez é trocada inteiramente em um dos dois tokens, dependendo do preço acima ou abaixo do intervalo. Se isso acontecer, sua posição só é deixada com 1 ativo e não ganha taxas de negociação até que o preço entre novamente no intervalo.
 
-**Principal Aspecto da Uniswap V3 é "Liquidez Concentrada"**
+# Liquidez Concentrada
+
+ - O recurso mais inovador da Uniswap V3’, liquidez concentrada, é um conceito revolucionário que aumenta significativamente a eficiência de capital para os LPs. Ao contrário das versões anteriores, onde a liquidez foi distribuída uniformemente em toda a faixa de preço, o V3 permite que os provedores de liquidez especifiquem uma faixa de preço para sua liquidez. Esta abordagem focada permite que os LPs criem “positions” que atuam como conjuntos de produtos constantes com reservas virtuais maiores dentro do seu intervalo especificado, maximizando a utilização dos seus ativos e minimizando o capital ocioso.
+ Isso significa que, em vez de seus ativos serem usados em todo o espectro de preços, eles podem optar por fornecer liquidez apenas dentro de uma faixa de preço específica. Essa abordagem permite que os LPs maximizem a utilização de seus ativos e potencialmente ganhem mais taxas.
+
+ - A introdução de tokens não fungíveis (NFTs) no V3 adiciona ainda um toque único, já que cada posição agora representa um NFT com propriedades específicas. Concentrando sua liquidez em faixas mais estreitas em torno do preço atual, oos LPs racionais podem reduzir seus custos de capital e ajustar suas posições à medida que o preço se move para manter sua liquidez ativa. Além disso, esta abordagem inovadora permite que os LPs tenham controle granular sobre sua exposição ao risco e adaptem suas posições à sua tolerância ao risco específica e perspectivas de mercado.
 
 # Fornecendo Liquidez
 
@@ -38,6 +43,14 @@
 
  - Uma consequência da liquidez concentrada é que as posições são altamente personalizadas, uma vez que os provedores de liquidez podem escolher não apenas o valor a depositar, mas também o intervalo em que desejam fornecer liquidez. Isso implica que as posições em um pool Uniswap v3 são naturalmente não fungíveis. Portanto, os provedores de liquidez devem receber tokens não fungíveis em troca de seu depósito, e esses tokens LP não fungíveis terão que manter um registro dos detalhes de sua posição específica. Além disso, devido ao recurso de provisão de liquidez personalizável, as taxas agora devem ser coletadas e armazenadas separadamente como tokens individuais, em vez de serem reinvestidas automaticamente como liquidez no pool.
 
+# Como Funciona o Uniswap V3 ?
+
+ - Para compreender ‘como funciona o Uniswap V3’, precisamos de explorar as suas características únicas e mecanismos subjacentes. Aprofundando-se no funcionamento interno da Uniswap V3’, a fórmula constante do fabricante do mercado de produtos (x * y = k) continua a ser a pedra angular do protocolo. No entanto, a nova liquidez concentrada e as faixas de preços personalizáveis transformam a maneira como os provedores de liquidez se envolvem com a plataforma. “Ticks” são componentes-chave na V3, representando pontos de preço igualmente espaçados ao longo de toda a gama de preços. Cada tick atua como um limite de intervalo exclusivo, permitindo que os LPs definam seu intervalo de liquidez selecionando dois ticks. À medida que os swaps são executados, o protocolo processa transações em segmentos, navegando pela liquidez disponível em cada faixa de preço e ajustando as reservas de acordo, mantendo o invariante (k).Esse mecanismo garante que a V3 gerencie efetivamente a liquidez em várias faixas de preços, fornecendo negociação eficiente e controle granular para LPs.`
+
+# Perda Impermanente
+
+ - Perda impermanente refere-se à perda que um provedor de liquidez pode experimentar quando a relação de preço do par de tokens em um pool de liquidez se desvia significativamente de quando eles depositaram seus ativos. No contexto da Uniswap V3, esse desvio pode levar a que a liquidez se torne inativa se estiver fora da faixa de preço especificada, aumentando assim o risco de perda impermanente. Na Uniswap V3, os provedores de liquidez escolhem a faixa de preço para a qual desejam fornecer liquidez. Se o preço de mercado do par de tokens se mover fora desse intervalo, sua liquidez não será usada para negociações e não ganhará taxas, tornando-se efetivamente inativa. Isso pode levar a um custo de oportunidade ou mesmo a uma perda se o preço de mercado se afastar do intervalo escolhido e não retornar antes que o provedor de liquidez retire seus ativos.O gerenciamento ativo de posições é, portanto, crucial na Uniswap V3 para mitigar esses riscos. Os LPs podem precisar ajustar freqüentemente suas faixas de preços para manter sua liquidez ativa e se alinhar às condições do mercado. Eles também podem precisar retirar sua liquidez se ela não estiver mais ativa, para evitar incorrer em perdas.
+
 # Ticks
 
  - Como mencionamos anteriormente, na Uniswap v3, os provedores de liquidez fornecem liquidez em uma faixa de preço limitada escolhida. No entanto, os limites inferior e superior deste intervalo não podem ser definidos arbitrariamente, mas podem ser escolhidos a partir de um finito (mas muito grande!) subconjunto do conjunto de números positivos reais. Os elementos deste subconjunto são chamados "ticks" e são indexados por números inteiros da seguinte maneira: eu ∈ Z representa o tick (e, portanto, o preço) p(eu) = 1.0001eu. Também diremos que o índice de tique-spacing para o tick p(eu) é eu.
@@ -70,13 +83,15 @@
  $$ {1.0001}^{82945}\approx 4000.142653. $$
  Se um provedor de liquidez quiser fornecer liquidez na faixa de preço [3700, 4300], podemos encontrar os índices de tick que estão perto dos limites desse intervalo aplicando a seguinte Equação :
  $$ \left\lfloor {\log}_{1.0001}3700\right\rfloor =82164,\left\lfloor {\log}_{1.0001}4300\right\rfloor =83667. $$
- Agora, calculamos os ticks que correspondem a esses índices de ticks e aos seguintes, já que os preços que estamos interessados estarão entre esses ticks. Exibimos os cálculos a seguir mesa :
 
- Índice de tick = 82.164 -- 82.165 -- 83.667 -- 83.668
+ - Então, cada tick representa um .01% (1 ponto base) movimento do preço do tick com i=0. O preço pode mover-se acima e abaixo de "1.0" por pequeno 0,01% passos no espaço inteiro (−∞,+∞).
+ - Agora, calculamos os ticks que correspondem a esses índices de ticks e aos seguintes, já que os preços que estamos interessados estarão entre esses ticks. Exibimos os cálculos a seguir mesa :
 
- Tick (aprox.) = 3.699.634 -- 3.700.004 -- 4.299.619 -- 4.300.049
+   Índice de tick = 82.164 -- 82.165 -- 83.667 -- 83.668
 
- Assim, o provedor de liquidez pode optar por fornecer liquidez no intervalo de preços [3.700,004, 4.300,049].
+   Tick (aprox.) = 3.699.634 -- 3.700.004 -- 4.299.619 -- 4.300.049
+
+   Assim, o provedor de liquidez pode optar por fornecer liquidez no intervalo de preços [3.700,004, 4.300,049].
 
  **Calculando**
  - Na rede principal, o token USDC ERC-20 tem 6 decimais, o ETH tem 18 decimais. No entanto, o preço rastreado pela Uniswap internamente não está ciente desses decimais: na verdade, é o preço de um micro-USDC (ou seja. 0.000001 USDC) por um wei.
@@ -147,4 +162,47 @@
     - 1,00%
     
   - Mais níveis de taxas podem ser adicionados pela governança da UNI se a comunidade decidir que há necessidade de níveis de taxas adicionais. Os níveis de taxas mais baixos atraem o volume de negociação, mas diminuem a receita para os provedores de liquidez.
+
+  - Essa estrutura de taxas personalizáveis garante que os pools com características variadas, como pares de stablecoins ou tokens altamente voláteis, possam otimizar suas taxas para um melhor desempenho do mercado. Por exemplo, os pools que trocam ativos de baixa volatilidade, como stablecoins, podem implementar o nível de taxa mais baixo, já que os provedores de liquidez não estão expostos ao risco de preço e esses swaps serão motivados a buscar um preço de execução mais próximo de 1:1 como eles podem obter. Ao oferecer diferentes níveis de taxas, o Uniswap V3 atende às necessidades de uma ampla gama de usuários, incluindo traders casuais, arbitrageurs e investidores institucionais. O resultado final é um ecossistema que equilibra os incentivos à provisão e negociação de liquidez, promovendo uma dinâmica de mercado saudável e crescimento orgânico.
+
+# Resumo
+
+**Por que razão foi introduzida a liquidez dentro de limites ?**
+  - Permite aos fornecedores de liquidez obterem mais comissões sobre o seu capital. Fornecendo liauidez apenas nas faixas onde os traders estão negociando. Agora na Uniswap V3, você pode especificar um intervalo onde os tokens serão negociados.
+
+  - Pode ganhar o mesmo montante de comissões, mas com um montante muito menor de capital para liquidez.
+
+  - Ajuda a aumentar a eficiência global do uniswap, uma vez que os provedores de liquidez podem concentrar seu capital em uma unica faixa de ação de preço, mais liquidez estará disponivel para os swappers, o que significa que a Uniswap terá muito valor para capturar, e serão capazes de aumentar os volumes de quantidades para trades, além de aumentar o volume de taxas.
+
+**Como isso é realmente implementado ?**
+  - primeiro, é precisso compreender a noção de TICKS.
+
+**Como é que decidimos quais são os Ticks?**
+  - Bom, cada tick segue uma formula, que é `T = log 1,0001^(p)`, isso afirma que cada tick corresponde a potencia que você tem que aumentar de um em um pontos base, o preço (p), é um valor arbitrario. Portanto, para cada preço arbitrario, há um valor de tick que podemos usar para aumentar um em um pontos base para receber o preço.
+  - Isso poderia ser restrito a `P = 1,0001^tick`.
+  - Se quisermo obter o preço que corresponde a um tick, tudo que precisamos fazer é aumentar um em um "bases points" para cada tick.
+    - Exemplo : 
+    - Pegue um tick de uma pool (Ex USDC/ETH é 194922)
+    - `1,0001 ^ 194922 = 291.696.797,189`
+    - Aqui temos o preço de um USDC em termos de ETH (291.696.797,189 USDC é um ETH), já que na pool, o token0 é USDC.
+    - Então agora pegamos esse valor de USDC em termo de ETH e invertemos, para encontrar o valor de ETH em termos de USDC.
+    - Sabemos que 1 ETH é 1e18, (1 unidade com 18 casas decimais)
+    - Dividimos 1 pelo valor em USDC, e dividimos por 1e18 `(1 / (291.696.797,189 / 1e18)`, logo dividimos por 1e6 (decimais do USDC)
+    - `(1 / (291.696.797,189 / 1e18)) / 1e6) = 3428.21`
+    - Valor de 1 ETH em USDC é $3428.21
+
+**Obtendo o preço real da raiz quadrada do preço na variável qrtPriceX96 :**
+  - O preço de um pool se parece com isso `sqrtPriceX96   uint160 :  1353165045894114495582256047512386`
+  - A formula que calculamos isso é S = raiz quadrada do preco / 2^96, 
+  - `1353165045894114495582256047512386 / 2**96 = 17079.3440483`
+  - `17079.3440483 ^ 2 = 291703993.12`
+  - `(1 / (291703993.12 / 1e18)) / 1e6) = 3428.13`
+
+**Como funciona o provisionamento de liquidez nestes intervalos de ticks**
+  - Após criar uma posição com tickLower (Tick Inferior) e TickUpper (Tick Superior), então toda a liquidez que é fornecida será basicamente dividida entre todos os intervalos de tick individuais, então teremos o mesmo valor de liquidez em cada um dos intervalos de ticks.
+
+  - Então, quando os swappers movem o preço na pool, ele cruza o limite da posição criada, começando por tickLower, e tornando a liquidez ativa. Então para cada tick subsequente em que o preço se move dentro da posição (Limite de ticks), a liquidez de cada tick é capaz de ser usada.
+  
+  - Quando acaba saindo da posição (Limite do tick), a liquidez é desativada, e sua liquidez total, é totalmente convertida para o token que sobra na pool (o menos valioso).
+
 
