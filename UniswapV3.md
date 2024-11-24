@@ -53,7 +53,9 @@
 
 # Ticks
 
- - Como mencionamos anteriormente, na Uniswap v3, os provedores de liquidez fornecem liquidez em uma faixa de preço limitada escolhida. No entanto, os limites inferior e superior deste intervalo não podem ser definidos arbitrariamente, mas podem ser escolhidos a partir de um finito (mas muito grande!) subconjunto do conjunto de números positivos reais. Os elementos deste subconjunto são chamados "ticks" e são indexados por números inteiros da seguinte maneira: eu ∈ Z representa o tick (e, portanto, o preço) p(eu) = 1.0001eu. Também diremos que o índice de tique-spacing para o tick p(eu) é eu.
+ - Na Uniswap v3, os provedores de liquidez fornecem liquidez em uma faixa de preço limitada escolhida. No entanto, os limites inferior e superior deste intervalo não podem ser definidos arbitrariamente, mas podem ser escolhidos a partir de um finito (mas muito grande!) subconjunto do conjunto de números positivos reais. Os elementos deste subconjunto são chamados "ticks" e são indexados por números inteiros da seguinte maneira: eu ∈ Z representa o tick (e, portanto, o preço) p(eu) = 1.0001eu. Também diremos que o índice de tique-spacing para o tick p(eu) é eu.
+
+ - “Ticks” são componentes-chave na V3, representando pontos de preço igualmente espaçados ao longo de toda a gama de preços. Cada tick atua como um limite de intervalo exclusivo, permitindo que os LPs definam seu intervalo de liquidez selecionando dois ticks. À medida que os swaps são executados, o protocolo processa transações em segmentos, navegando pela liquidez disponível em cada faixa de preço e ajustando as reservas de acordo, mantendo o invariante (k).Esse mecanismo garante que a V3 gerencie efetivamente a liquidez em várias faixas de preços, fornecendo negociação eficiente e controle granular para LPs.
 
  - Os Ticks são usados no Uniswap v3 para determinar a liquidez que está dentro do intervalo. Os pools Uniswap v3 são compostos de ticks que variam de -887272 a 887272, que funcionalmente equivalem a um preço simbólico entre 0 e infinito, respectivamente.
 
@@ -67,7 +69,7 @@
  $$ A=\frac{L}{\sqrt{p}}\kern1em \textrm{and}\kern1em B=L\cdot \sqrt{p}. $$
  Portanto, L e $$ \sqrt{p} $$ pode ser usado para rastrear o estado do pool, e isso é o que o Uniswap v3 AMM faz. Note que
  $$ \sqrt{p}(i)={1.0001}^{\frac{i}{2}} $$
- Dado qualquer preço p, o índice de tick associado a p é definido como o índice de carrapatos do maior carrapato t isso satisfaz t ≤ p. Assim, o índice de carrapatos eu associado ao preço p é dado por
+ Dado qualquer preço p, o índice de tick associado a p é definido como o índice de tick do maior tick t isso satisfaz t ≤ p. Assim, o índice de ticks eu associado ao preço p é dado por
  $$ i=\left\lfloor {\log}_{1.0001}\;p\right\rfloor =\left\lfloor 2{\log}_{1.0001}\sqrt{p}\right\rfloor, $$
  onde para qualquer número real x, ⌊x⌋ denota o piso de xé o maior inteiro que é menor ou igual a x.
 
@@ -75,7 +77,7 @@
  - Considere um pool Uniswap v3 com tokens ETH e DAI com o seguinte saldos :
    $$ DAI = {40.000} $$  $$ ETH = {10} $$        
 
- - Observe que o preço spot atual é 4.000 DAI/ETH (40.000/10). Este preço está associado, via Equação 5.1, para o índice de tick
+ - Observe que o preço spot atual é 4.000 DAI/ETH (40.000 / 10). Este preço está associado, via Equação 5.1, para o índice de tick
  $$ i=\left\lfloor {\log}_{1.0001}4000\right\rfloor =82944. $$
  Observe que o índice do tick 82.944 corresponde ao preço
  $$ {1.0001}^{82944}\approx 3999.742678 $$
@@ -96,12 +98,12 @@
  **Calculando**
  - Na rede principal, o token USDC ERC-20 tem 6 decimais, o ETH tem 18 decimais. No entanto, o preço rastreado pela Uniswap internamente não está ciente desses decimais: na verdade, é o preço de um micro-USDC (ou seja. 0.000001 USDC) por um wei.
 
- - Este preço é calculado calculando o expoente da constante de base de carrapato Uniswap v3 1.0001. Se o preço for 205930, você obtém seu resultado:
+ - Este preço é calculado calculando o expoente da constante de base de tick Uniswap v3 1.0001. Se o preço for 205930, você obtém seu resultado:
 
- - 1.0001 ** 205930 = 876958666.4726943
+ - `1.0001 ** 205930 = 876958666.4726943`
  - Para ajustar esse preço interno a um preço legível por humanos, você deve multiplicá-lo por 10^6 (os decimais do USDC) e divida por 10^18 (os decimais de [W]ETH), que é igual a multiplicar o preço por 10**-12.
 
- - 876958666.4726943 * (10 ** -12) = 0.0008769586664726943
+ - `876958666.4726943 * (10 ** -12) = 0.0008769586664726943`
  - Finalmente, você provavelmente quer o inverso deste número. O pequeno número que você acabou de obter é o preço do USDC em termos de ETH, mas geralmente queremos acompanhar o preço do ETH em termos de USD[C]. Isso ocorre porque o preço no Uniswap é definido como igual a token1/token0, e este é um pool USDC/WETH, o que significa que token0 é USDC e token1 é WETH.
 
    Isso calcula o inverso :
@@ -180,7 +182,7 @@
 **Como é que decidimos quais são os Ticks?**
   - Bom, cada tick segue uma formula, que é `T = log 1,0001^(p)`, isso afirma que cada tick corresponde a potencia que você tem que aumentar de um em um pontos base, o preço (p), é um valor arbitrario. Portanto, para cada preço arbitrario, há um valor de tick que podemos usar para aumentar um em um pontos base para receber o preço.
   - Isso poderia ser restrito a `P = 1,0001^tick`.
-  - Se quisermo obter o preço que corresponde a um tick, tudo que precisamos fazer é aumentar um em um "bases points" para cada tick.
+  - Se quisermos obter o preço que corresponde a um tick, tudo que precisamos fazer é aumentar um em um "bases points" para cada tick.
     - Exemplo : 
     - Pegue um tick de uma pool (Ex USDC/ETH é 194922)
     - `1,0001 ^ 194922 = 291.696.797,189`
@@ -192,7 +194,7 @@
     - Valor de 1 ETH em USDC é $3428.21
 
 **Obtendo o preço real da raiz quadrada do preço na variável qrtPriceX96 :**
-  - O preço de um pool se parece com isso `sqrtPriceX96   uint160 :  1353165045894114495582256047512386`
+  - O preço de um pool se parece com isso `sqrtPriceX96 uint160 : 1353165045894114495582256047512386`
   - A formula que calculamos isso é S = raiz quadrada do preco / 2^96, 
   - `1353165045894114495582256047512386 / 2**96 = 17079.3440483`
   - `17079.3440483 ^ 2 = 291703993.12`
