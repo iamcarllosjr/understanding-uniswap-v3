@@ -150,6 +150,21 @@
 
   - Usando a tabela acima, podemos determinar o tick-spacing da pool diretamente do nível de taxa. Mostramos a porcentagem e o formato bps para esses valores, como usados de forma intercambiável pelos profissionais, mas podem ser confusos para novos usuários.
 
+# sqtrPriceX96 
+
+  - Se você já leu o código Uniswap v3 e viu variáveis que terminam com X96 ou X128, você se deparou com o que chamamos de notação Q. Com Uniswap v3 veio o uso pesado da notação Q para representar números fracionários em ponto fixo aritmética. 
+  - Para encurtar a história, você pode converter da notação Q para o “real value” dividindo por 2^k onde k é o valor após o X. Por exemplo, você pode converter sqrtPriceX96 para `sqrtPrice / 2^96`.
+  - O seu tipo de dado em um contrato de pool é `uint160`, isso significa que contem 160 bits de informações, onde o numero em sim é um numero de ponto fixo binário `Q64.96`, onde 64 bits dos 160 são alcodados para o lador esquerdo da casa decimal, e 96 bits são alocados para a parte direita.
+
+  ```javascript
+   sqtrPriceX96 ^ 2
+   ----------------  = 291703993.119 
+      2 ^ 192
+  ```
+  ```javascript
+  1 / 291703993.119 = 3,428.13271
+  ```
+
 # Taxas
 
   - Houve algumas mudanças importantes na forma como as taxas são distribuídas ao comparar o Uniswap V2 e o V3. Na Versão 2, as taxas foram automaticamente reinvestidas no pool de liquidez e esse não é mais o caso na Versão 3. Na Uniswap V3, as taxas são cobradas separadamente do pool e exigem resgate manual acionado sempre que o proprietário da posição quiser cobrar suas taxas. 
@@ -195,10 +210,22 @@
 
 **Obtendo o preço real da raiz quadrada do preço na variável qrtPriceX96 :**
   - O preço de um pool se parece com isso `sqrtPriceX96 uint160 : 1353165045894114495582256047512386`
-  - A formula que calculamos isso é S = raiz quadrada do preco / 2^96, 
-  - `1353165045894114495582256047512386 / 2**96 = 17079.3440483`
-  - `17079.3440483 ^ 2 = 291703993.12`
-  - `(1 / (291703993.12 / 1e18)) / 1e6) = 3428.13`
+  - A formula que calculamos isso é  (`sqtrPriceX96 / 2^96`)^2
+  - Então : `(1353165045894114495582256047512386 / 2**96) ** 2 = 291703993.12`
+  - `(1 / (291703993.12 / 1e18)) / 1e6) = 3428.13 USDC/ETH`
+
+**Diferença entre Tick Atual e sqrtPriceX96 :**
+  - Diferença entre Tick Atual e sqrtPriceX96
+  Embora relacionados, o tick atual e o sqrtPriceX96 não são exatamente iguais:
+
+  - O tick atual é um número inteiro arredondado para baixo.
+  - O sqrtPriceX96 contém informações mais precisas sobre o preço atual.
+    - Por exemplo :
+
+    - Tick atual : 202919
+    - Preço calculado do tick: ≈ 648962487.5642413
+    - sqrtPriceX96: ≈ 649004842.70137
+  - A diferença ocorre porque o tick atual é arredondado para baixo, enquanto o sqrtPriceX96 mantém informações mais precisas sobre o preço real.
 
 **Como funciona o provisionamento de liquidez nestes intervalos de ticks**
   - Após criar uma posição com tickLower (Tick Inferior) e TickUpper (Tick Superior), então toda a liquidez que é fornecida será basicamente dividida entre todos os intervalos de tick individuais, então teremos o mesmo valor de liquidez em cada um dos intervalos de ticks.
